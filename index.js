@@ -24,7 +24,7 @@ http.createServer((req, res) => {
 			DH.setPrivateKey(privKey, encodeType)
 			var secret = DH.computeSecret(decodeURIComponent(params.r), encodeType)
 
-			res.writeHead(200, {'Content-Type': 'text/html', 'Set-Cookie': 'x='})
+			res.writeHead(200, {'Content-Type': 'text/html', 'Set-Cookie': 'x=deleted; expires=Thu, 01 Jan 1970 00:00:00 GTM'})
 			res.write('The secret is: '+secret.toString('base64'))
 		} else {
 			res.writeHead(200, {'Content-Type': 'text/html'})
