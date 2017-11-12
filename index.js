@@ -13,7 +13,11 @@ function parseCookies(request) {
 }
 
 http.createServer((req, res) => {
-	var params = url.parse(req.url, true).query
+	const params = url.parse(req.url, true).query
+	var host = ''
+	if(req.connection.encrypted) host = 'https://'
+	else host = 'http://'
+	host += req.headers.host;
 	const encodeType = 'base64'
 
 	if('g' in params && 'r' in params) {
@@ -43,7 +47,7 @@ http.createServer((req, res) => {
 			var r = encodeURIComponent(DH.generateKeys(encodeType))
 			var x = encodeURIComponent(DH.getPrivateKey(encodeType))
 
-			res.write('Don\'t access. Just share:<br>\nhttps://dh.jlxip.net/?g='+encodeURIComponent(params.g)+'&r='+r)
+			res.write('Don\'t access. Just share:<br>\n'+host+'/?g='+encodeURIComponent(params.g)+'&r='+r)
 		} catch(e) {
 			res.write('The generator (\'g\' by GET) is not valid.')
 		}
@@ -53,13 +57,13 @@ http.createServer((req, res) => {
 			var newDH = crypto.createDiffieHellman(parseInt(params.s))
 			var g = encodeURIComponent(newDH.getPrime(encodeType))
 
-			res.write('Share and access:<br>\nhttps://dh.jlxip.net/?g='+g)
+			res.write('Share and access:<br>\n'+host+'/?g='+g)
 		} else {
 			res.write('Wrong size. Choose a power of two. 512 for tests. 2048 for real scenarios (it might be slower to generate).')
 		}
 	} else {
 		res.writeHead(200, {'Content-Type': 'text/html'})
-		res.write('First, create a G value:<br>\nhttps://dh.jlxip.net/?s=2048')
+		res.write('First, create a G value:<br>\n'+host+'/?s=2048')
 	}
 
 	res.end()
