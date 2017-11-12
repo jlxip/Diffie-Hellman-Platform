@@ -18,12 +18,18 @@ http.createServer((req, res) => {
 
 	if('g' in params && 'r' in params) {
 		var DH = crypto.createDiffieHellman(params.g, encodeType)
-		var privKey = decodeURIComponent(parseCookies(req).x)
-		DH.setPrivateKey(privKey, encodeType)
-		var secret = DH.computeSecret(decodeURIComponent(params.r), encodeType)
+		var cookies = parseCookies(req)
+		if('x' in cookies) {
+			var privKey = decodeURIComponent(parseCookies(req).x)
+			DH.setPrivateKey(privKey, encodeType)
+			var secret = DH.computeSecret(decodeURIComponent(params.r), encodeType)
 
-		res.writeHead(200, {'Content-Type': 'text/html', 'Set-Cookie': 'x='})
-		res.write('The secret is: '+secret.toString('base64'))
+			res.writeHead(200, {'Content-Type': 'text/html', 'Set-Cookie': 'x='})
+			res.write('The secret is: '+secret.toString('base64'))
+		} else {
+			res.writeHead(200, {'Content-Type': 'text/html'})
+			res.write('You don\'t have the \'x\' (private key) cookie.')
+		}
 	} else if('g' in params) {
 		var DH = crypto.createDiffieHellman(decodeURIComponent(params.g), encodeType)
 		var r = encodeURIComponent(DH.generateKeys(encodeType))
