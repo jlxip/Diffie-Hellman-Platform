@@ -54,16 +54,20 @@ http.createServer((req, res) => {
 	} else if('s' in params) {
 		res.writeHead(200, {'Content-Type': 'text/html'})
 		if(parseInt(params.s)) {
-			var newDH = crypto.createDiffieHellman(parseInt(params.s))
-			var g = encodeURIComponent(newDH.getPrime(encodeType))
+			try {
+				var newDH = crypto.createDiffieHellman(parseInt(params.s))
+				var g = encodeURIComponent(newDH.getPrime(encodeType))
 
-			res.write('Share and access:<br>\n'+host+'/?g='+g)
+				res.write('Share and access:<br>\n'+host+'/?g='+g)
+			} catch(e) {
+				res.write('Wrong size.')
+			}
 		} else {
-			res.write('Wrong size. Choose a power of two. 512 for tests. 2048 for real scenarios (it might be slower to generate).')
+			res.write('Wrong size.')
 		}
 	} else {
 		res.writeHead(200, {'Content-Type': 'text/html'})
-		res.write('First, create a G value:<br>\n'+host+'/?s=2048')
+		res.write('First, create a G value.<br><br>\n\nFor tests: '+host+'/?s=512<br>\nFor real scenarios: '+host+'/?s=2048')
 	}
 
 	res.end()
